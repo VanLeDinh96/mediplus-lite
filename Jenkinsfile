@@ -9,8 +9,8 @@ pipeline {
         stage('Push Docker Hub') {
             steps {
                 withDockerRegistry(credentialsId: 'creds-dockerhub', url: '') {
-                    sh label: '', script: 'docker build -t vanle96/web:2.0 .'
-                    sh label: '', script: 'docker push vanle96/web:2.0'
+                    sh label: '', script: 'docker build -t vanle96/web:latest .'
+                    sh label: '', script: 'docker push vanle96/web:latest'
                 }
             }
         }
