@@ -1,22 +1,17 @@
 pipeline {
     agent any
     stages {
-        stage('Build') {
+        stage('Clone') {
             steps {
-                echo 'Building...'
-                echo '1...'
-                echo '2...'
-                echo '3...'
+                git branch: 'main', credentialsId: 'cred-github', url: 'https://github.com/letdoitnow/mediplus-lite'
             }
         }
-        stage('Test') {
+        stage('Push Docker Hub') {
             steps {
-                echo 'Testing...'
-            }
-        }
-        stage('Deploy') {
-            steps {
-                echo 'Deploying...'
+                withDockerRegistry(credentialsId: 'creds-dockerhub', url: '') {
+                    sh label: '', script: 'docker build -t vanle96/web:2.0 .'
+                    sh label: '', script: 'docker push vanle96/web:2.0'
+                }
             }
         }
     }
