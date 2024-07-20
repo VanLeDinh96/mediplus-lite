@@ -1,16 +1,15 @@
-FROM jenkins/jenkins:lts
+FROM ubuntu
 
-USER root
+RUN apt update && apt install -y openssh-server sudo
 
-# Install Docker
-RUN apt-get update && \
-    apt-get install -y apt-transport-https ca-certificates curl gnupg2 software-properties-common && \
-    curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - && \
-    add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable" && \
-    apt-get update && \
-    apt-get install -y docker-ce-cli
+RUN mkdir /var/run/sshd
 
-# Allow Jenkins user to run Docker commands
-RUN usermod -aG docker jenkins
+RUN useradd -m -d /home/admin -s /bin/bash -G sudo -u 1000 admin && echo 'admin:admin' | chpasswd
 
-USER jenkins
+RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+    echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config && \
+    echo "AllowUsers admin" >> /etc/ssh/sshd_config
+
+EXPOSE 22
+
+CMD ["/usr/sbin/sshd", "-D"]
